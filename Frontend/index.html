@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-page">
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="welcome-text">
+                <h1>Dashboard</h1>
+                <p>¡Has iniciado sesión correctamente!</p>
+            </div>
+            <!-- Opcional: Enlace para cerrar sesión que apunte a un script de logout -->
+            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>Estado</h3>
+                <div class="value">Activo</div>
+            </div>
+            <div class="card">
+                <h3>Rol</h3>
+                <div class="value">Admin</div>
+            </div>
+            <div class="card">
+                <h3>Notificaciones</h3>
+                <div class="value">3 Nuevas</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <p style="color: var(--muted-color); line-height: 1.6;">
+                Este es el área protegida. Solo puedes ver esto si tu variable <code>$logueado</code> es verdadera en el
+                backend.
+            </p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

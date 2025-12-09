@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="login-page">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Bienvenido</h1>
+            <p>Ingresa tus credenciales para continuar</p>
+        </div>
+
+        <!-- El action se maneja via JS -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" id="email" name="email" class="form-input" value="admin@admin.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+
+        <div class="footer-text">
+            <p>¿No tienes cuenta? <a href="#">Regístrate</a></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
