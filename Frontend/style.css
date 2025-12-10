@@ -33,7 +33,10 @@ body.login-page {
     min-height: 100vh;
     background: linear-gradient(135deg, #0a0e1a 0%, #1e1b4b 50%, #1a1f35 100%);
     position: relative;
-    overflow: hidden;
+    position: relative;
+    overflow-y: auto;
+    /* Allow scrolling if content is tall */
+    overflow-x: hidden;
 }
 
 body.login-page::before {

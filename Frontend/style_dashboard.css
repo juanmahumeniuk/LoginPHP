@@ -375,3 +375,29 @@
         transform: translateY(10px);
     }
 }
+
+/* Mobile Toolbar Stacking */
+@media (max-width: 768px) {
+    .dashboard-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .dashboard-toolbar input,
+    .dashboard-toolbar select,
+    .dashboard-toolbar button {
+        width: 100%;
+    }
+
+    #toast-container {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        bottom: 10px;
+    }
+
+    .toast {
+        min-width: unset;
+        width: 100%;
+    }
+}
