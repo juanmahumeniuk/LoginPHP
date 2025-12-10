@@ -167,11 +167,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if ($action === 'get_tickets') {
         header('Content-Type: application/json');
-        $query = "SELECT * FROM tickets ORDER BY fecha DESC";
-        $result = mysqli_query($conn, $query);
+
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
+        $offset = ($page - 1) * $limit;
+        $search = $_GET['search'] ?? '';
+
+        $filter_estado = $_GET['filter_estado'] ?? '';
+        $filter_fecha = $_GET['filter_fecha'] ?? '';
+
+        $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM tickets WHERE 1=1";
+        $types = "";
+        $params = [];
+
+        if (!empty($search)) {
+            $sql .= " AND (descripcion LIKE ? OR enlace LIKE ?)";
+            $types .= "ss";
+            $searchTerm = "%$search%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        if (!empty($filter_estado)) {
+            $sql .= " AND estado = ?";
+            $types .= "s";
+            $params[] = $filter_estado;
+        }
+        if (!empty($filter_fecha)) {
+            $sql .= " AND fecha = ?";
+            $types .= "s";
+            $params[] = $filter_fecha;
+        }
+
+        // Sort by date (handle DD/MM/YYYY and YYYY-MM-DD)
+        // STR_TO_DATE return NULL if format doesn't match
+        $sql .= " ORDER BY COALESCE(STR_TO_DATE(fecha, '%d/%m/%Y'), STR_TO_DATE(fecha, '%Y-%m-%d')) DESC, enlace DESC LIMIT ? OFFSET ?";
+        $types .= "ii";
+        $params[] = $limit;
+        $params[] = $offset;
+
+        $stmt = $conn->prepare($sql);
+        if ($types) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $tickets = [];
-        while ($row = mysqli_fetch_assoc($result)) {
+        while ($row = $result->fetch_assoc()) {
             $tickets[] = [
                 "enlace" => $row["enlace"] ?? "",
                 "descripcion" => $row["descripcion"] ?? "",
@@ -182,7 +225,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 "fecha" => $row["fecha"] ?? ""
             ];
         }
-        echo json_encode($tickets);
+
+        $totalHeaders = $conn->query("SELECT FOUND_ROWS()");
+        $totalRows = $totalHeaders->fetch_row()[0];
+
+        echo json_encode([
+            'data' => $tickets,
+            'total' => $totalRows,
+            'page' => $page,
+            'limit' => $limit,
+            'totalPages' => ceil($totalRows / $limit)
+        ]);
+
+        $stmt->close();
         exit;
     } elseif ($action === 'navigate') {
         // API navigate check (if used by JS)
@@ -192,9 +247,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         } else {
             echo json_encode(['status' => 'ok', 'page' => 'login.html']);
         }
-    } elseif ($action === 'getUserCount') {
+    } elseif ($action === 'getTicketCount') {
         header('Content-Type: application/json');
-        $count = getUserCount();
+        $count = getTicketCount();
+        echo json_encode(['status' => 'ok', 'count' => $count]);
+    } elseif ($action === 'getEsperandoLlamadaCount') {
+        header('Content-Type: application/json');
+        $count = getEsperandoLlamadaCount();
+        echo json_encode(['status' => 'ok', 'count' => $count]);
+    } elseif ($action === 'getCreatedTodayCount') {
+        header('Content-Type: application/json');
+        $count = getCreatedTodayCount();
         echo json_encode(['status' => 'ok', 'count' => $count]);
     } elseif ($action === 'login_google') {
         // Redirect to Google
@@ -232,10 +295,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-function getUserCount()
+function getTicketCount()
 {
     global $conn;
-    $query = "SELECT COUNT(*) as count FROM users";
+    $query = "SELECT COUNT(*) as count FROM tickets";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['count'];
+}
+
+function getEsperandoLlamadaCount()
+{
+    global $conn;
+    $query = "SELECT COUNT(*) as count FROM tickets WHERE estado = 'Esperando llamada'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['count'];
+}
+
+function getCreatedTodayCount()
+{
+    global $conn;
+    $query = "SELECT COUNT(*) as count FROM tickets WHERE fecha = CURRENT_DATE()";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
     return $row['count'];

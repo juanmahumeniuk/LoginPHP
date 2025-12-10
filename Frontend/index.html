@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Gestión de Tickets</title>
     <link rel="stylesheet" href="../Frontend/style.css">
+    <link rel="stylesheet" href="../Frontend/style_dashboard.css">
 </head>
 
 <body class="dashboard-page">
     <div class="container">
         <div class="dashboard-header">
             <div class="welcome-text">
-                <h1>Dashboard</h1>
-                <p>¡Has iniciado sesión correctamente!</p>
+                <h1>Gestión de Tickets</h1>
+                <p>Asistente de gestión</p>
             </div>
             <!-- Opcional: Enlace para cerrar sesión que apunte a un script de logout -->
             <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
@@ -21,30 +22,149 @@
 
         <div class="card-grid">
             <div class="card">
-                <h3>Estado</h3>
-                <div class="value">Activo</div>
+                <h3>Bienvenido</h3>
+                <div class="value" id="nombreUsuario"></div>
             </div>
             <div class="card">
-                <h3>Rol</h3>
-                <div class="value">Admin</div>
+                <h3>Creados hoy</h3>
+                <div class="value" id="createdTodayCount"></div>
             </div>
             <div class="card">
-                <h3>Notificaciones</h3>
-                <div class="value">3 Nuevas</div>
+                <h3>Esperando Llamada</h3>
+                <div class="value" id="esperandoLlamadaCount"></div>
             </div>
             <div class="card">
-                <h3>Usuarios</h3>
-                <div class="value" id="userCount"></div>
+                <h3>Tickets</h3>
+                <div class="value" id="ticketCount"></div>
             </div>
         </div>
 
+        <!-- Ticket Dashboard -->
         <div class="card">
-            <p style="color: var(--muted-color); line-height: 1.6;">
-                Este es el área protegida. Solo puedes ver esto si tu variable <code>$logueado</code> es verdadera en el
-                backend.
-            </p>
+            <div class="dashboard-toolbar">
+                <input type="text" id="searchInput" placeholder="Buscar tickets...">
+                <select id="filterEstado">
+                    <option value="">Todos los Estados</option>
+                    <option value="RESUELTO">RESUELTO</option>
+                    <option value="SIN RESOLVER">SIN RESOLVER</option>
+                    <option value="ESPERANDO RESPUESTA">ESPERANDO RESPUESTA</option>
+                </select>
+                <button class="btn-primary" onclick="openTicketModal()">Nuevo Ticket</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="dashboard-table" id="ticketsTable">
+                    <thead>
+                        <tr>
+                            <th>Enlace</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Tickets loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="paginationControls">
+                <!-- Pagination buttons -->
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="ticketModal" class="modal">
+            <div class="modal-content">
+                <h2 id="modalTitle">Ticket</h2>
+                <form id="ticketForm">
+                    <input type="hidden" id="ticketId" name="enlace"> <!-- Enlace es el ID -->
+                    <div class="form-group">
+                        <label>Enlace (ID)</label>
+                        <input type="text" id="ticketEnlace" name="enlace_input" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <select id="ticketDescripcion" name="descripcion" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="FIA ID - Actualización">FIA ID - Actualización</option>
+                                <option value="PPR - ID">PPR - ID</option>
+                                <option value="FIA - ID">FIA - ID</option>
+                                <option value="CTC - ID">CTC - ID</option>
+                                <option value="Alta nuevo usuario">Alta nuevo usuario</option>
+                                <option value="Alta nuevo usuario (Duplicado)">Alta nuevo usuario (Duplicado)</option>
+                                <option value="Cambio de usuario">Cambio de usuario</option>
+                                <option value="FIA ID - Subcontrato">FIA ID - Subcontrato</option>
+                                <option value="PPR ID - Subcontrato">PPR ID - Subcontrato</option>
+                                <option value="CTC ID - Subcontrato">CTC ID - Subcontrato</option>
+                                <option value="Información">Información</option>
+                                <option value="HH fuera de término">HH fuera de término</option>
+                                <option value="Skype">Skype</option>
+                                <option value="OTRO">OTRO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select id="ticketEstado" name="estado" required>
+                                <option value="RESUELTO">RESUELTO</option>
+                                <option value="NO RESUELTO">NO RESUELTO</option>
+                                <option value="ESPERANDO RESPUESTA">ESPERANDO RESPUESTA</option>
+                                <option value="ESPERANDO LLAMADA">ESPERANDO LLAMADA</option>
+                                <option value="ESCALADO">ESCALADO</option>
+                                <option value="LLAMAR">LLAMAR</option>
+                                <option value="CONSULTAR">CONSULTAR</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Carga Datos</label>
+                            <select id="ticketCarga" name="carga_datos">
+                                <option value="">Seleccionar...</option>
+                                <option value="DATOS CARGADOS">DATOS CARGADOS</option>
+                                <option value="DATOS NO CARGADOS">DATOS NO CARGADOS</option>
+                                <option value="DATOS PARCIALMENTE CARGADOS">DATOS PARCIALMENTE CARGADOS</option>
+                                <option value="-">-</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Demoras</label>
+                            <select id="ticketDemoras" name="demoras">
+                                <option value="">Seleccionar...</option>
+                                <option value="NINGUNA">NINGUNA</option>
+                                <option value="DOCUMENTO MAL CARGADO">DOCUMENTO MAL CARGADO</option>
+                                <option value="DOCUMENTO NO CARGADO">DOCUMENTO NO CARGADO</option>
+                                <option value="RAZÓN SOCIAL DISCREPANTE">RAZÓN SOCIAL DISCREPANTE</option>
+                                <option value="SIN NÚMERO DE CONTRATO">SIN NÚMERO DE CONTRATO</option>
+                                <option value="FECHA INICIO CONTRATO">FECHA INICIO CONTRATO</option>
+                                <option value="FECHA INICIO SERNAGEOMÍN">FECHA INICIO SERNAGEOMÍN</option>
+                                <option value="OTRO">OTRO</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Datos Faltantes</label>
+                            <select id="ticketFaltantes" name="datos_faltantes">
+                                <option value="">Seleccionar...</option>
+                                <option value="-">-</option>
+                                <option value="TODOS">TODOS</option>
+                                <option value="NÚMERO DE CONTRATO">NÚMERO DE CONTRATO</option>
+                                <option value="TIPO DE CONTRATO">TIPO DE CONTRATO</option>
+                                <option value="TIPO DE SOLICITUD">TIPO DE SOLICITUD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" id="ticketFecha" name="fecha">
+                        </div>
+                        <div class="modal-actions" style="margin-top:20px; text-align:right;">
+                            <button type="button" onclick="closeTicketModal()">Cancelar</button>
+                            <button type="submit" class="btn-primary">Guardar</button>
+                        </div>
+                </form>
+            </div>
         </div>
     </div>
+    <div id="toast-container"></div>
     <script src="../Frontend/script.js"></script>
 </body>
 
