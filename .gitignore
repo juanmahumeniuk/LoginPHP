@@ -1,0 +1,4 @@
+# Archivos de configuración
+/Backend/config.php
+/Backend/database.php
+database.sql

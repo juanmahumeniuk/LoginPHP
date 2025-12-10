@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
+    <title>Registro</title>
     <link rel="stylesheet" href="../Frontend/style.css">
 </head>
 
 <body class="login-page">
     <div class="login-card">
         <div class="login-header">
-            <h1>Bienvenido</h1>
-            <p>Ingresa tus credenciales para continuar</p>
+            <h1>Registro</h1>
+            <p>Ingresa tus datos para crear una cuenta</p>
         </div>
 
         <!-- El action se maneja via JS -->
-        <form id="loginForm">
+        <form id="registerForm">
             <div class="form-group">
                 <label for="email" class="form-label">Correo Electrónico</label>
                 <input type="email" id="email" name="email" class="form-input" value="admin@admin.com" required>
@@ -28,19 +28,11 @@
                     value="admin123" required>
             </div>
 
-            <button type="button" class="btn" id="loginButton" onclick="login()">Iniciar Sesión</button>
-
-            <div style="margin-top: 1rem; text-align: center;">
-                <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #eee;">
-                <a href="../Backend/index.php?action=login_google" class="btn"
-                    style="background-color: #db4437; text-decoration: none; display: block;">
-                    Iniciar sesión con Google
-                </a>
-            </div>
+            <button type="button" class="btn" id="registerButton" onclick="register()">Registrarse</button>
         </form>
 
         <div class="footer-text">
-            <p>¿No tienes cuenta? <a href="../Frontend/register.html">Regístrate</a></p>
+            <p>¿Ya tienes cuenta? <a href="login.html">Inicia Sesión</a></p>
         </div>
     </div>
     <script src="../Frontend/script.js"></script>
