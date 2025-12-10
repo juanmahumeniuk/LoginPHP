@@ -252,9 +252,33 @@ body.dashboard-page {
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* First card takes 2x space of others */
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 1.5rem;
     margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .card-grid {
+        grid-template-columns: 1fr 1fr;
+        /* 2x2 grid on tablets */
+    }
+
+    .card:first-child {
+        grid-column: span 2;
+        /* Make first card span full width on tablets if desired, or just simple grid */
+    }
+}
+
+@media (max-width: 640px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+        /* Stack on mobile */
+    }
+
+    .card:first-child {
+        grid-column: span 1;
+    }
 }
 
 .card {
